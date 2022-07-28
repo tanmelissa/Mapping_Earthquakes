@@ -29,17 +29,37 @@ let map = L.map('mapid', {
 let earthquakeData = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson"
 
 //style function
-function styleInfo(feature){
+function styleInfo(feature) {
     return {
         opacity: 1,
         fillOpacity: 1,
-        fillColor: "#ffae42",
+        fillColor: getColor(feature.properties.mag),
         color: "#000000",
         radius: getRadius(feature.properties.mag),
         stroke: true,
         weight: 0.5
     }
 };
+
+//color function
+function getColor(magnitude) {
+    if (magnitude > 5) {
+      return "#ea2c2c";
+    }
+    if (magnitude > 4) {
+      return "#ea822c";
+    }
+    if (magnitude > 3) {
+      return "#ee9c00";
+    }
+    if (magnitude > 2) {
+      return "#eecc00";
+    }
+    if (magnitude > 1) {
+      return "#d4ee00";
+    }
+    return "#98ee00";
+  };
 
 //radius function
 function getRadius(magnitude) {
@@ -58,6 +78,9 @@ d3.json(earthquakeData).then(function(data){
             return L.circleMarker(latlng);
         },
         style: styleInfo,
+        onEachFeature: function(feature, layer) {
+            layer.bindPopup("Magnitude: " + feature.properties.mag + "<br>Location: " + feature.properties.place);
+        }
     }).addTo(map);
 });
 
