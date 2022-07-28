@@ -28,11 +28,36 @@ let map = L.map('mapid', {
 //accessing the earthquak data GeoJSON URL
 let earthquakeData = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson"
 
+//style function
+function styleInfo(feature){
+    return {
+        opacity: 1,
+        fillOpacity: 1,
+        fillColor: "#ffae42",
+        color: "#000000",
+        radius: getRadius(feature.properties.mag),
+        stroke: true,
+        weight: 0.5
+    }
+};
+
+//radius function
+function getRadius(magnitude) {
+    if (magnitude === 0) {
+        return 1;
+    }
+    return magnitude * 4;
+}
 //grabbing our GeoJSON data
 d3.json(earthquakeData).then(function(data){
     console.log(data);
     //creating a GeoJSON layer with the retrieved data
-    L.geoJSON(data).addTo(map);
+    L.geoJSON(data, {
+        pointToLayer: function(feature, latlng){
+            return L.circleMarker(latlng);
+        },
+        style: styleInfo,
+    }).addTo(map);
 });
 
 //pass our map layers into our layers control and add the layers control to the map
